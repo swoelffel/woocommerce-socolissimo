@@ -40,31 +40,6 @@ class OS_socolissimo_wrapper {
         woocommerce_socolissimo_init();
     }
 
-    /**
-     *  Surcharge du bouton commander dans le panier pour socolissimo
-     */
-    function generate_sc_url() {
-        global $woocommerce;
-        $myWC_SoColissimo = new WC_SoColissimo();
-
-        error_log('generate_sc_url :' . $woocommerce->session->chosen_shipping_method);
-
-        if ($woocommerce->session->chosen_shipping_method == 'socolissimo') {
-            $retour = '<p>' . $this->prepost_message . '</p>' . "\r\n" . '
-                <script>
-                    function launchSocolissimo() {
-                        //document.location.href="'.$myWC_SoColissimo->socolissimo_iframe_url.'";
-                        jQuery("form.checkout").attr("action", "' . $myWC_SoColissimo->socolissimo_iframe_url . '");
-                        jQuery("form.checkout").unbind("submit");
-                        jQuery("form.checkout").submit();
-                    }
-                    t=setTimeout("launchSocolissimo()",2000);
-                </script>
-                ';
-            wp_die($retour);
-        }
-    }
-
 // Ajout du ShortCode pour la page iframe
 
     /**
@@ -78,8 +53,11 @@ class OS_socolissimo_wrapper {
             return;
         }
         define('OS_socolissimo_FILE_PATH', dirname(__FILE__));
+	
         // Installation ici
-        // Desinstallation ici
+	include_once('admin/socolissimo-install-table.php');
+	install_table();
+	
         error_log('install');
     }
 
@@ -88,6 +66,9 @@ class OS_socolissimo_wrapper {
      */
     public function deactivate() {
         // Desinstallation ici
+	include_once('admin/socolissimo-install-table.php');
+	uninstall_table();
+	
         error_log('uninstall');
     }
 

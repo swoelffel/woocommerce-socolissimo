@@ -1,4 +1,5 @@
 <?php
+error_log('templates/socolissimo.php');
 $xhtml_header = '<html><body><div>';
 $xhtml_footer = '</div></body></html>';
 
@@ -226,13 +227,6 @@ $So_SIGNATURE = sha1(
         . $so_trReturnUrlOk
         . $so_merchantKey
 );
-error_log('Session_id=' . session_id());
-if (session_id() == '')
-    session_start();
-error_log('Session_id=' . session_id());
-$_SESSION['woocommerce_socolissimo_signature'] = $So_SIGNATURE;
-
-error_log('Template : Session WC : ' . $_SESSION['woocommerce_socolissimo_signature']);
 
 $champs_pudo_fo = array();
 array_push($champs_pudo_fo, '<form name="formpudocall" action="' . $so_formAction_trReturnUrlKo . '" method="post">', '<input type="hidden" name="pudoFOId" value="' . $so_PudoFOID . '">');
@@ -250,6 +244,9 @@ array_push($champs_pudo_fo, '</form>');
 $form_socolissimo = $xhtml_header . implode("", $champs_pudo_fo) . $xhtml_footer;
 ?>
 <script type="text/javascript">
+    // On efface le formulaire Standard
+    // document.getElementById("customer_details").style.display = "none";
+    // On affiche l'iframe SoColissimo
     jQuery(document).ready(function($) {
         if ( document.getElementById("SoColissimo_IFrame") ) {
             var data='<?php echo($form_socolissimo) ?>';
