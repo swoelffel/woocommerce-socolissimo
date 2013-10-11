@@ -29,6 +29,3 @@ Nothing to do
 
 = 0.1.0 =
 first Beta version.
-
-= 0.2.0 =
-usable version.

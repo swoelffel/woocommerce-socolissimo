@@ -277,34 +277,69 @@ function woocommerce_socolissimo_check_response() {
             
             require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
             
+            // si l'utilisateur est connecté, on récupère ses infos
+            $idUser = null;
+            if ( is_user_logged_in() ) {
+				$current_user = wp_get_current_user();
+                $idUser = $current_user->ID;
+            }
+                
+            
             // TODO : controle des données
             error_log(print_r($_POST, true));
             if (isset($_GET['TRRETURNURLKO']) && (isset($_POST['SIGNATURE']))) {
+                
+                // on récupère la signature
+                $signature = (!empty($_POST['SIGNATURE'])) ? ($_POST['SIGNATURE']) : '';
+                // on vérifie la signature => a faire
+                //
+                
                 $checkout = array(
-                    'civility' => (!empty($_POST['CECIVILITY'])) ? ($_POST['CECIVILITY']) : '',
-                    'last_name' => (!empty($_POST['CENAME'])) ? ($_POST['CENAME']) : '',
-                    'first_name' => (!empty($_POST['CEFIRSTNAME'])) ? ($_POST['CEFIRSTNAME']) : '',
-                    'company_name' => (!empty($_POST['CECOMPANYNAME'])) ? ($_POST['CECOMPANYNAME']) : '',
-                    'infos_appart' => (!empty($_POST['CEADRESS1'])) ? ($_POST['CEADRESS1']) : '',
-                    'infos_bat' => (!empty($_POST['CEADRESS2'])) ? ($_POST['CEADRESS2']) : '',
-                    'adresse_1' => (!empty($_POST['CEADRESS3'])) ? ($_POST['CEADRESS3']) : '',
-                    'adresse_2' => (!empty($_POST['CEADRESS4'])) ? ($_POST['CEADRESS4']) : '',
-                    'city' => (!empty($_POST['CETOWN'])) ? ($_POST['CETOWN']) : '',
-                    'postcode' => (!empty($_POST['CEZIPCODE'])) ? ($_POST['CEZIPCODE']) : '',
-                    'delivery_info' => (!empty($_POST['CEDELIVERYINFORMATION'])) ? ($_POST['CEDELIVERYINFORMATION']) : '',
-                    'door_code_1' => (!empty($_POST['CEDOORCODE1'])) ? ($_POST['CEDOORCODE1']) : '',
-                    'door_code_2' => (!empty($_POST['CEDOORCODE2'])) ? ($_POST['CEDOORCODE2']) : '',
-                    'mail' => (!empty($_POST['CEEMAIL'])) ? ($_POST['CEEMAIL']) : '',
-                    'phone_number' => (!empty($_POST['CEPHONENUMBER'])) ? ($_POST['CEPHONENUMBER']) : '',
+                    // 'id_panier' => '', ID panier à définir
+                    'delivery_mode' => (!empty($_POST['DELIVERYMODE'])) ? ($_POST['DELIVERYMODE']) : '',
+                    'ce_civility' => (!empty($_POST['CECIVILITY'])) ? ($_POST['CECIVILITY']) : '',
+                    'ce_name' => (!empty($_POST['CENAME'])) ? ($_POST['CENAME']) : '',
+                    'ce_first_name' => (!empty($_POST['CEFIRSTNAME'])) ? ($_POST['CEFIRSTNAME']) : '',
+                    'ce_company_name' => (!empty($_POST['CECOMPANYNAME'])) ? ($_POST['CECOMPANYNAME']) : '',
+                    'ce_phone_number' => (!empty($_POST['CEPHONENUMBER'])) ? ($_POST['CEPHONENUMBER']) : '',
+                    'ce_delivery_information' => (!empty($_POST['CEDELIVERYINFORMATION'])) ? ($_POST['CEDELIVERYINFORMATION']) : '',
+                    'ce_door_code1' => (!empty($_POST['CEDOORCODE1'])) ? ($_POST['CEDOORCODE1']) : '',
+                    'ce_door_code2' => (!empty($_POST['CEDOORCODE2'])) ? ($_POST['CEDOORCODE2']) : '',
+                    'ce_entry_phone' => (!empty($_POST['CEENTRYPHONE'])) ? ($_POST['CEENTRYPHONE']) : '', // Aucune info
+                    'ce_email' => (!empty($_POST['CEEMAIL'])) ? ($_POST['CEEMAIL']) : '',
+                    'ce_adress1' => (!empty($_POST['CEADRESS1'])) ? ($_POST['CEADRESS1']) : '',
+                    'ce_adress2' => (!empty($_POST['CEADRESS2'])) ? ($_POST['CEADRESS2']) : '',
+                    'ce_adress3' => (!empty($_POST['CEADRESS3'])) ? ($_POST['CEADRESS3']) : '',
+                    'ce_adress4' => (!empty($_POST['CEADRESS4'])) ? ($_POST['CEADRESS4']) : '',
+                    'ce_zip_code' => (!empty($_POST['CEZIPCODE'])) ? ($_POST['CEZIPCODE']) : '',
+                    'ce_town' => (!empty($_POST['CETOWN'])) ? ($_POST['CETOWN']) : '',
+                    
+                    'pr_name' => (!empty($_POST['PRNAME'])) ? ($_POST['PRNAME']) : '',
+                    'pr_id' => (!empty($_POST['PRID'])) ? ($_POST['PRID']) : '',
+                    'pr_adress1' => (!empty($_POST['PRADRESS1'])) ? ($_POST['PRADRESS1']) : '',
+                    'pr_town' => (!empty($_POST['PRTOWN'])) ? ($_POST['PRTOWN']) : '',
+                    'pr_zip_code' => (!empty($_POST['PRZIPCODE'])) ? ($_POST['PRZIPCODE']) : '',
+                    
+                    'dy_preparationtime' => (!empty($_POST['DYPREPARATIONTIME'])) ? ($_POST['DYPREPARATIONTIME']) : '',
+                    'dy_forwarding_charges' => (!empty($_POST['DYFORWARDINGCHARGES'])) ? ($_POST['DYFORWARDINGCHARGES']) : '',
+                    
+                    'order_id' => (!empty($_POST['ORDERID'])) ? ($_POST['ORDERID']) : '',
+                    'tr_order_number' => (!empty($_POST['TRORDERNUMBER'])) ? ($_POST['TRORDERNUMBER']) : '',
+                    'trader_company_name' => (!empty($_POST['TRADERCOMPANYNAME'])) ? ($_POST['TRADERCOMPANYNAME']) : '',
+                    
+                    'error_code' => (!empty($_POST['ERRORCODE'])) ? ($_POST['ERRORCODE']) : '',
+ 
+                    'id_user' => $idUser,
+                    'date_creation' => date('Y-m-d H:i:s')
                 );
            
             $keys = implode(', ', array_keys($checkout));
             $values = "'" . implode("', '", $checkout) . "'";
             
-            $sql = "INSERT INTO {$wpdb->prefix}socolissimo_checkout_shipping($keys) VALUES($values)";
+            $sql = "INSERT INTO {$wpdb->prefix}woocommerce_socolissimo($keys) VALUES($values)";
             
             dbDelta($sql);
-            $insertId = $wpdb->query("SELECT LAST_INSERT_ID() FROM {$wpdb->prefix}socolissimo_checkout_shipping");
+            $insertId = $wpdb->query("SELECT LAST_INSERT_ID() FROM {$wpdb->prefix}woocommerce_socolissimo");
             
             $my_WC_SoColissimo = new WC_SoColissimo();
             error_log('Redirect Paiement : ' . $my_WC_SoColissimo->socolissimo_url_ok . '&SOCO=ok');
@@ -325,66 +360,66 @@ function	woocommerce_socolissimo_overload_checkout_value() {
     // Si on a un id pour récupérer les données
     if (!empty($_GET['id_chekout_customer'])) {
         // On récupère les données
-        $data = $wpdb->get_results($wpdb->prepare("SELECT * FROM {$wpdb->prefix}socolissimo_checkout_shipping WHERE id=%d LIMIT 1", $_GET['id_chekout_customer']));
+        $data = $wpdb->get_results($wpdb->prepare("SELECT * FROM {$wpdb->prefix}woocommerce_socolissimo WHERE id=%d LIMIT 1", $_GET['id_chekout_customer']));
         
         // Si la requete renvoie rien, on quitte directement la fonction
         if (!isset($data[0]))
             return;
         
         error_log('Data : ' . print_r($data[0], true));
+
+        // Setting des infos de facturation
+        $_POST['billing_first_name'] = $data[0]->ce_first_name;
+        $_POST['billing_last_name'] = $data[0]->ce_name;
+        $_POST['billing_company'] = $data[0]->ce_company_name;
+        $_POST['billing_address_1'] = $data[0]->ce_adress3;
+        $_POST['billing_address_2'] = $data[0]->ce_adress4;
+        $_POST['billing_address_2'] .= ' ' . $data[0]->ce_adress1;
+        $_POST['billing_address_2'] .= ' ' . $data[0]->ce_adress2;
+        $_POST['billing_postcode'] = $data[0]->ce_zip_code;
+        $_POST['billing_city'] = $data[0]->ce_town;
+        $_POST['billing_country'] = 'FR';
+        $_POST['billing_email'] = $data[0]->ce_email;
+        $_POST['billing_phone'] = $data[0]->ce_phone_number;
         
-        // Nom et prénom
-        $_POST['billing_first_name'] = $data[0]->first_name;
-        $_POST['billing_last_name'] = $data[0]->last_name;
-        $_POST['shipping_first_name'] = $data[0]->first_name;
-        $_POST['shipping_last_name'] = $data[0]->last_name;
+        if ($data[0]->delivery_mode == 'A2P')
+            $data[0]->delivery_mode = 'BPR';
         
-        // Infos sur la société
-        $_POST['billing_company'] = $data[0]->company_name;
-        $_POST['shipping_company'] = $data[0]->company_name;
+        switch ($data[0]->delivery_mode) {
+            case 'DOM': // DOMICILE
+                $_POST['shipping_first_name'] = $data[0]->ce_first_name;
+                $_POST['shipping_last_name'] = $data[0]->ce_name;
+                $_POST['shipping_company'] = $data[0]->ce_company_name;
+                $_POST['shipping_address_1'] = $data[0]->ce_adress3;
+                $_POST['shipping_address_2'] = $data[0]->ce_adress4;
+                $_POST['shipping_address_2'] .= ' ' . $data[0]->ce_adress1;
+                $_POST['shipping_address_2'] .= ' ' . $data[0]->ce_adress2;
+                $_POST['shipping_postcode'] = $data[0]->ce_zip_code;
+                $_POST['shipping_city'] = $data[0]->ce_town;
+                $_POST['shipping_country'] = 'FR';
+                $_POST['order_comments'] = '';
+                if (!empty($data[0]->door_code_1))
+                    $_POST['order_comments'] .= 'Code porte 1 : ' . $data[0]->door_code_1 . PHP_EOL;
+                if (!empty($data[0]->door_code_2))
+                    $_POST['order_comments'] .= 'Code porte 2 : ' . $data[0]->door_code_2 . PHP_EOL;
+                if (!empty($data[0]->delivery_info))
+                    $_POST['order_comments'] .= 'Informations de livraison : ' . $data[0]->delivery_info . PHP_EOL;
+                break;
+            case 'BPR': // BUREAU DE POSTE
+                $_POST['shipping_first_name'] = $data[0]->ce_first_name;
+                $_POST['shipping_last_name'] = $data[0]->ce_name;
+                $_POST['shipping_company'] = $data[0]->pr_name;
+                $_POST['shipping_address_1'] = $data[0]->pr_adress1;
+                $_POST['shipping_postcode'] = $data[0]->pr_zip_code;
+                $_POST['shipping_city'] = $data[0]->pr_town;
+                $_POST['billing_address_1'] = ' ';
+                $_POST['billing_address_2'] = ' ';
+                $_POST['billing_postcode'] = ' ';
+                $_POST['billing_city'] = ' ';
+                break;
+        }
         
-        // Infos adresses
-        $_POST['billing_address_1'] = $data[0]->adresse_1;
-        $_POST['shipping_address_1'] = $data[0]->adresse_1;
-        $_POST['billing_address_2'] = $data[0]->adresse_2;
-        $_POST['shipping_address_2'] = $data[0]->adresse_2;
-        $_POST['billing_address_2'] .= ' ' . $data[0]->infos_appart;
-        $_POST['shipping_address_2'] .= ' ' . $data[0]->infos_appart;
-        $_POST['billing_address_2'] .= ' ' . $data[0]->infos_bat;
-        $_POST['shipping_address_2'] .= ' ' . $data[0]->infos_bat;
-        
-        // Code postal et ville
-        $_POST['billing_postcode'] = $data[0]->postcode;
-        $_POST['shipping_postcode'] = $data[0]->postcode;
-        $_POST['billing_city'] = $data[0]->city;
-        $_POST['shipping_city'] = $data[0]->city;
-        
-        // mail et tel
-        $_POST['billing_email'] = $data[0]->mail;
-        $_POST['billing_phone'] = $data[0]->phone_number;
-        
-        // commentaire commande
-        $_POST['order_comments'] = '';
-        if (!empty($data[0]->door_code_1))
-            $_POST['order_comments'] .= 'Code porte 1 : ' . $data[0]->door_code_1 . PHP_EOL;
-        if (!empty($data[0]->door_code_2))
-            $_POST['order_comments'] .= 'Code porte 2 : ' . $data[0]->door_code_2 . PHP_EOL;
-        if (!empty($data[0]->delivery_info))
-            $_POST['order_comments'] .= 'Informations de livraison : ' . $data[0]->delivery_info . PHP_EOL;
     }
-    
     error_log('POST : ' . print_r($_POST, true));
     
-	/*global $woocommerce;
-	
-	if (is_user_logged_in()) {
-		
-		$current_user = wp_get_current_user();
-		error_log(print_r($current_user, true));
-
-		if ($current_user->user_email != '') {
-			$_POST['billing_email'] = $current_user->user_email;
-			$_POST['shipping_email'] = $current_user->user_email;
-		}
-	}*/
 }

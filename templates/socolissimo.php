@@ -18,11 +18,14 @@ $so_PudoFOID = $myWC_SoColissimo->socolissimo_PudoFOID;
 
 $checkout = $woocommerce->checkout();
 
+
+
 if ($checkout->get_value('shiptobilling') == 1) {
     $shipping_infos = array(
         'email' => $checkout->get_value('billing_email'),
-        'first_name' => $checkout->get_value('billing_first_name'),
-        'last_name' => $checkout->get_value('billing_last_name'),
+        'customers_telephone' => $checkout->get_value('billing_phone'),
+        'first_name' => ($checkout->get_value('billing_first_name')) ? ($checkout->get_value('billing_first_name')) : ($checkout->get_value('first_name')),
+        'last_name' => ($checkout->get_value('billing_last_name')) ? ($checkout->get_value('billing_last_name')) : ($checkout->get_value('last_name')),
         'company' => $checkout->get_value('billing_company'),
         'address_1' => $checkout->get_value('billing_address_1'),
         'address_2' => $checkout->get_value('billing_address_2'),
@@ -35,8 +38,9 @@ if ($checkout->get_value('shiptobilling') == 1) {
 } else {
     $shipping_infos = array(
         'email' => $checkout->get_value('billing_email'),
-        'first_name' => $checkout->get_value('shipping_first_name'),
-        'last_name' => $checkout->get_value('shipping_last_name'),
+        'customers_telephone' => $checkout->get_value('billing_phone'),
+        'first_name' => ($checkout->get_value('shipping_first_name')) ? ($checkout->get_value('shipping_first_name')) : ($checkout->get_value('first_name')),
+        'last_name' => ($checkout->get_value('shipping_last_name')) ? ($checkout->get_value('shipping_last_name')) : ($checkout->get_value('last_name')),
         'company' => $checkout->get_value('shipping_company'),
         'address_1' => $checkout->get_value('shipping_address_1'),
         'address_2' => $checkout->get_value('shipping_address_2'),
@@ -80,13 +84,13 @@ $so_ceAdress1 = substr(remove_accents(''), 0, 38);
 $so_ceAdress2 = substr(remove_accents(''), 0, 38);
 
 /* ceAdress3 */
-$so_ceAdress3 = substr(remove_accents($shipping_infos['shipping_address_1']), 0, 38);
+$so_ceAdress3 = substr(remove_accents($shipping_infos['address_1']), 0, 38);
 
 /* ceAdress4 */
-$so_ceAdress4 = substr(remove_accents($shipping_infos['shipping_address_2']), 0, 38);
+$so_ceAdress4 = substr(remove_accents($shipping_infos['address_2']), 0, 38);
 
 /* ceZipCode */
-if (preg_match("/^(?:[0-9]{1}|A{1})(?:[0-9]{1}|D{1})(?:[0-9a-zA-Z]{1}|0{1})(?:[0-9a-zA-Z]{2})$/", $shipping_infos['entry_postcode'])) {
+if (preg_match("/^(?:[0-9]{1}|A{1})(?:[0-9]{1}|D{1})(?:[0-9a-zA-Z]{1}|0{1})(?:[0-9a-zA-Z]{2})$/", $shipping_infos['postcode'])) {
     $so_ceZipCode = $shipping_infos['postcode'];
 } else {
     $so_ceZipCode = '';
@@ -94,6 +98,10 @@ if (preg_match("/^(?:[0-9]{1}|A{1})(?:[0-9]{1}|D{1})(?:[0-9a-zA-Z]{1}|0{1})(?:[0
 
 /* ceTown */
 $so_ceTown = substr(remove_accents($shipping_infos['city']), 0, 32);
+
+/* cePays */
+$so_cePays = substr(remove_accents($shipping_infos['country']), 0, 32);
+$so_cePays = 'FR';
 
 /* ceDoorCode1 */
 $so_ceDoorCode1 = '';
@@ -130,15 +138,13 @@ if (strlen($shipping_infos['email']) >= 5 && strlen($shipping_infos['email']) <=
     $so_ceEmail = '';
 }
 
-/* cePhoneNumber
-  $shipping_infos['customers_telephone'] = str_replace(array('.', ' '), array('', ''), $shipping_infos['customers_telephone']);
-  if (preg_match("/^[0-9]{0,10}$/", $shipping_infos['customers_telephone'])) {
-  $so_cePhoneNumber = $shipping_infos['customers_telephone'];
-  } else {
-  $so_cePhoneNumber = '';
-  }
- */
-$so_cePhoneNumber = '';
+/* cePhoneNumber */
+$shipping_infos['customers_telephone'] = str_replace(array('.', ' '), array('', ''), $shipping_infos['customers_telephone']);
+if (preg_match("/^[0-9]{0,10}$/", $shipping_infos['customers_telephone'])) {
+    $so_cePhoneNumber = $shipping_infos['customers_telephone'];
+} else {
+    $so_cePhoneNumber = '';
+}
 
 /* dyWeight */
 $so_dyWeight = (int) ($shipping_infos['weight'] * 1000);
@@ -174,18 +180,21 @@ if (preg_match("/^[a-zA-Z0-9]{1,30}$/", '')) {
 $so_trFirstOrder = $myWC_SoColissimo->first_order;
 
 /* trParamPlus */
-$so_trParamPlus = substr(remove_accents(''), 0, 256);
+$so_trParamPlus = substr(remove_accents('testblabla'), 0, 256);
 
 /* orderId */
 $generated_order_id = date('dHis') . $so_trClientNumber;
 if (preg_match("/^[a-zA-Z0-9]{5,16}$/", $generated_order_id)) {
     $so_orderId = $generated_order_id;
 } else {
-    die('<script type="text/javascript" charset="utf-8">alert("ERREUR: module:So_Colissimo -> $so_orderId - l\'orderId \'' . $so_orderId . '\' est invalide, veuillez contacter le gérant du magasin");</script>');
+    die('<script type="text/javascript" charset="utf-8">alert("ERREUR: module:So_Colissimo -> $so_orderId - l\'orderId \'' . $so_orderId . '\' est invalide, veuillez contacter le g�rant du magasin");</script>');
 }
 
 /* numVersion */
-$so_numVersion = '3.0'; // type: INTEGER
+$so_numVersion = '4.0'; // type: INTEGER
+
+/* Option internationnal */
+$so_trInter = 0;
 
 /* clefSHA */
 $so_merchantKey = $myWC_SoColissimo->socolissimo_merchantKey;
@@ -196,7 +205,7 @@ $so_merchantKey = $myWC_SoColissimo->socolissimo_merchantKey;
   SONT DONC OBLIGATOIRE:       $so_PudoFOID,  $so_dyForwardingCharges,  $so_orderId,  $so_numVersion,  $so_trReturnUrlKo,  $so_merchantKey
  */
 
-$So_SIGNATURE = sha1(
+$So_SIGNATURE = 
         $so_PudoFOID
         . $so_ceName
         . $so_dyPreparationTime
@@ -225,11 +234,21 @@ $So_SIGNATURE = sha1(
         . $so_trParamPlus
         . $so_trReturnUrlKo
         . $so_trReturnUrlOk
+        . $so_cePays
+        . $so_trInter
         . $so_merchantKey
-);
+;
+
+
+
+error_log(sha1($So_SIGNATURE));
+error_log($So_SIGNATURE);
 
 $champs_pudo_fo = array();
-array_push($champs_pudo_fo, '<form name="formpudocall" action="' . $so_formAction_trReturnUrlKo . '" method="post">', '<input type="hidden" name="pudoFOId" value="' . $so_PudoFOID . '">');
+array_push($champs_pudo_fo, 
+        '<form name="formpudocall" action="' . $so_formAction_trReturnUrlKo . '" method="post">', 
+        '<input type="hidden" name="pudoFOId" value="' . $so_PudoFOID . '">'
+        );
 
 if (!empty($so_ceCompanyName)) {
     // on envoie le champ uniquement dans le cas que le client qui commande est une société.
@@ -237,11 +256,42 @@ if (!empty($so_ceCompanyName)) {
     array_push($champs_pudo_fo, '<input type="hidden" name="ceCompanyName" value="' . $so_ceCompanyName . '">');
 }
 
-array_push($champs_pudo_fo, '<input type="hidden" name="ceCivility" value="' . $so_ceCivility . '">', '<input type="hidden" name="ceName" value="' . $so_ceName . '">', '<input type="hidden" name="dyPreparationTime" value="' . $so_dyPreparationTime . '">', '<input type="hidden" name="dyForwardingCharges" value="' . $so_dyForwardingCharges . '">', '<input type="hidden" name="ceFirstName" value="' . $so_ceFirstName . '">', '<input type="hidden" name="ceAdress1" value="' . $so_ceAdress1 . '">', '<input type="hidden" name="ceAdress2" value="' . $so_ceAdress2 . '">', '<input type="hidden" name="ceAdress3" value="' . $so_ceAdress3 . '">', '<input type="hidden" name="ceAdress4" value="' . $so_ceAdress4 . '">', '<input type="hidden" name="ceZipCode" value="' . $so_ceZipCode . '">', '<input type="hidden" name="ceTown" value="' . $so_ceTown . '">', '<input type="hidden" name="ceDoorCode1" value="' . $so_ceDoorCode1 . '">', '<input type="hidden" name="ceDoorCode2" value="' . $so_ceDoorCode2 . '">', '<input type="hidden" name="ceEntryPhone" value="' . $so_ceEntryPhone . '">', '<input type="hidden" name="ceDeliveryInformation" value="' . $so_ceDeliveryInformation . '">', '<input type="hidden" name="ceEmail" value="' . $so_ceEmail . '">', '<input type="hidden" name="cePhoneNumber" value="' . $so_cePhoneNumber . '">', '<input type="hidden" name="dyWeight" value="' . $so_dyWeight . '">', '<input type="hidden" name="trClientNumber" value="' . $so_trClientNumber . '">', '<input type="hidden" name="trOrderNumber" value="' . $so_trOrderNumber . '">', '<input type="hidden" name="trFirstOrder" value="' . $so_trFirstOrder . '">', '<input type="hidden" name="orderId" value="' . $so_orderId . '">', '<input type="hidden" name="numVersion" value="' . $so_numVersion . '">', '<input type="hidden" name="signature" value="' . $So_SIGNATURE . '">', '<input type="hidden" name="trReturnUrlOk" value="' . $so_trReturnUrlOk . '">');
+array_push($champs_pudo_fo, 
+        '<input type="hidden" name="ceCivility" value="' . $so_ceCivility . '">', 
+        '<input type="hidden" name="ceName" value="' . $so_ceName . '">', 
+        '<input type="hidden" name="dyPreparationTime" value="' . $so_dyPreparationTime . '">', 
+        '<input type="hidden" name="dyForwardingCharges" value="' . $so_dyForwardingCharges . '">', 
+        '<input type="hidden" name="ceFirstName" value="' . $so_ceFirstName . '">', 
+        '<input type="hidden" name="ceAdress1" value="' . $so_ceAdress1 . '">', 
+        '<input type="hidden" name="ceAdress2" value="' . $so_ceAdress2 . '">', 
+        '<input type="hidden" name="ceAdress3" value="' . $so_ceAdress3 . '">', 
+        '<input type="hidden" name="ceAdress4" value="' . $so_ceAdress4 . '">', 
+        '<input type="hidden" name="ceZipCode" value="' . $so_ceZipCode . '">', 
+        '<input type="hidden" name="ceTown" value="' . $so_ceTown . '">', 
+        '<input type="hidden" name="ceDoorCode1" value="' . $so_ceDoorCode1 . '">', 
+        '<input type="hidden" name="ceDoorCode2" value="' . $so_ceDoorCode2 . '">', 
+        '<input type="hidden" name="ceEntryPhone" value="' . $so_ceEntryPhone . '">', 
+        '<input type="hidden" name="ceDeliveryInformation" value="' . $so_ceDeliveryInformation . '">', 
+        '<input type="hidden" name="ceEmail" value="' . $so_ceEmail . '">', 
+        '<input type="hidden" name="cePhoneNumber" value="' . $so_cePhoneNumber . '">', 
+        '<input type="hidden" name="dyWeight" value="' . $so_dyWeight . '">', 
+        '<input type="hidden" name="trClientNumber" value="' . $so_trClientNumber . '">', 
+        '<input type="hidden" name="trOrderNumber" value="' . $so_trOrderNumber . '">', 
+        '<input type="hidden" name="trFirstOrder" value="' . $so_trFirstOrder . '">', 
+        '<input type="hidden" name="orderId" value="' . $so_orderId . '">', 
+        '<input type="hidden" name="numVersion" value="' . $so_numVersion . '">', 
+        '<input type="hidden" name="signature" value="' . sha1($So_SIGNATURE) . '">',
+        '<input type="hidden" name="trParamPlus" value="' . $so_trParamPlus . '">',
+        '<input type="hidden" name="trReturnUrlKo" value="' . $so_trReturnUrlKo . '">',
+        '<input type="hidden" name="trReturnUrlOk" value="' . $so_trReturnUrlOk . '">',
+        '<input type="hidden" name="cePays" value="' . $so_cePays . '">',
+        '<input type="hidden" name="trInter" value="' . $so_trInter . '">'
+        );
 
 array_push($champs_pudo_fo, '</form>');
 
 $form_socolissimo = $xhtml_header . implode("", $champs_pudo_fo) . $xhtml_footer;
+
 ?>
 <script type="text/javascript">
     // On efface le formulaire Standard

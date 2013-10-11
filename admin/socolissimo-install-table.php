@@ -28,26 +28,42 @@ function install_table() {
     require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
     
 	$socolissimo_checkout_infos = "
-		CREATE TABLE IF NOT EXISTS {$wpdb->prefix}socolissimo_checkout_shipping (
-			id bigint(20) NOT NULL auto_increment,
-			civility varchar(4) NULL,
-			first_name varchar(30) NULL,
-			last_name varchar(30) NULL,
-			company_name varchar(255) NULL,
-			infos_appart varchar(255) NULL,
-			infos_bat varchar(255) NULL,
-			adresse_1 varchar(255) NULL,
-			adresse_2 varchar(255) NULL,
-			postcode varchar(20) NULL,
-			city varchar(255) NULL,
-			country varchar(255) NULL,
-			mail varchar(255) NULL,
-			phone_number varchar(255) NULL,
-            delivery_info varchar(255) NULL,
-            door_code_1 varchar(30) NULL,
-            door_code_2 varchar(30) NULL,
-			PRIMARY KEY  (id)
-		)
+		CREATE TABLE IF NOT EXISTS {$wpdb->prefix}woocommerce_socolissimo (
+			`id` int(11) NOT NULL AUTO_INCREMENT,
+            `id_panier` int(11) NOT NULL,
+            `delivery_mode` varchar(63) DEFAULT NULL,
+            `ce_civility` varchar(8) DEFAULT NULL,
+            `ce_name` varchar(255) DEFAULT NULL,
+            `ce_first_name` varchar(255) DEFAULT NULL,
+            `ce_company_name` varchar(127) DEFAULT NULL,
+            `ce_phone_number` varchar(15) DEFAULT NULL,
+            `ce_delivery_information` varchar(127) DEFAULT NULL,
+            `ce_door_code1` varchar(8) DEFAULT NULL,
+            `ce_door_code2` varchar(8) DEFAULT NULL,
+            `ce_entry_phone` varchar(15) DEFAULT NULL,
+            `ce_email` varchar(127) DEFAULT NULL,
+            `ce_adress1` varchar(127) DEFAULT NULL,
+            `ce_adress2` varchar(127) DEFAULT NULL,
+            `ce_adress3` varchar(127) DEFAULT NULL,
+            `ce_adress4` varchar(127) DEFAULT NULL,
+            `ce_zip_code` varchar(15) DEFAULT NULL,
+            `ce_town` varchar(127) DEFAULT NULL,
+            `tr_param_plus` varchar(127) DEFAULT NULL,
+            `pr_name` varchar(255) DEFAULT NULL,
+            `pr_id` varchar(63) DEFAULT NULL,
+            `pr_adress1` varchar(255) DEFAULT NULL,
+            `pr_town` varchar(255) DEFAULT NULL,
+            `pr_zip_code` varchar(15) DEFAULT NULL,
+            `dy_preparationtime` varchar(2) DEFAULT NULL,
+            `dy_forwarding_charges` varchar(8) DEFAULT NULL,
+            `error_code` varchar(8) DEFAULT NULL,
+            `tr_order_number` varchar(31) DEFAULT NULL,
+            `order_id` varchar(31) DEFAULT NULL,
+            `trader_company_name` varchar(127) DEFAULT NULL,
+            `id_user` int(11) DEFAULT NULL,
+            `date_creation` datetime DEFAULT NULL,
+            PRIMARY KEY (`id`)
+		) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1
 	";
 	dbDelta($socolissimo_checkout_infos);
 }
@@ -57,6 +73,6 @@ function uninstall_table() {
     
     require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
     
-	$socolissimo_checkout_infos = "DROP TABLE IF EXISTS {$wpdb->prefix}socolissimo_checkout_shipping";
+	$socolissimo_checkout_infos = "DROP TABLE IF EXISTS {$wpdb->prefix}woocommerce_socolissimo";
 	dbDelta($socolissimo_checkout_infos);
 }
